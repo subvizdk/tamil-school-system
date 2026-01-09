@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'pages/home_page.dart';
 import 'pages/students_page.dart';
 import 'pages/batches_page.dart';
+import 'pages/batch_picker_page.dart';
 import 'pages/exams_page.dart';
 
 class BreadcrumbItem {
@@ -37,8 +38,6 @@ class AppShell extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
-
-        // Back on subpages; hamburger on root pages
         leading: canGoBack
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -51,7 +50,7 @@ class AppShell extends StatelessWidget {
                 ),
               ),
 
-        // ✅ Always allow opening the menu, even on subpages
+        // ✅ Always allow opening the drawer (even on sub pages)
         actions: [
           Builder(
             builder: (context) => IconButton(
@@ -166,11 +165,25 @@ class _AppDrawer extends StatelessWidget {
               title: const Text("Batches"),
               onTap: () => _go(context, const BatchesPage()),
             ),
+
+            // ✅ Exams needs a batch, so go via BatchPickerPage
             ListTile(
               selected: selectedIndex == 3,
               leading: const Icon(Icons.edit_calendar_outlined),
               title: const Text("Exams"),
-              onTap: () => _go(context, const ExamsPage()),
+              onTap: () => _go(
+                context,
+                BatchPickerPage(
+                  title: "Exams",
+                  drawerIndex: 3,
+                  onPicked: (ctx, batch) {
+                    Navigator.pushReplacement(
+                      ctx,
+                      MaterialPageRoute(builder: (_) => ExamsPage(batch: batch)),
+                    );
+                  },
+                ),
+              ),
             ),
           ],
         ),

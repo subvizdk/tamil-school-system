@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../main.dart'; // global api
+
 import '../app_shell.dart';
+import '../main.dart'; // global api
 
 class ExamResultsPage extends StatefulWidget {
-  final Map<String, dynamic> exam; // {id,title,exam_date,max_marks,...}
+  final Map exam; // {id,title,exam_date,max_marks,...}
+
   const ExamResultsPage({super.key, required this.exam});
 
   @override
@@ -16,7 +18,6 @@ class _ExamResultsPageState extends State<ExamResultsPage> {
 
   List<Map<String, dynamic>> _rows = []; // {student_id, student_name, marks, remarks}
 
-  // controllers keyed by student_id
   final Map<int, TextEditingController> _marksCtrls = {};
   final Map<int, TextEditingController> _remarksCtrls = {};
 
@@ -48,7 +49,7 @@ class _ExamResultsPageState extends State<ExamResultsPage> {
       final data = await api.getExamResults(examId);
 
       final students = (data["students"] as List).cast<dynamic>();
-      final rows = students.map((e) => Map<String, dynamic>.from(e)).toList();
+      final rows = students.map((e) => Map<String, dynamic>.from(e as Map)).toList();
 
       // init controllers
       for (final r in rows) {
@@ -63,7 +64,7 @@ class _ExamResultsPageState extends State<ExamResultsPage> {
           () => TextEditingController(text: (r["remarks"] ?? "").toString()),
         );
 
-        // update text if reload
+        // update on reload
         _marksCtrls[sid]!.text = (r["marks"] ?? "").toString();
         _remarksCtrls[sid]!.text = (r["remarks"] ?? "").toString();
       }
@@ -83,11 +84,10 @@ class _ExamResultsPageState extends State<ExamResultsPage> {
   Future<void> _submit() async {
     final examId = widget.exam["id"] as int;
 
-    // Build payload: only include rows with marks entered
     final List<Map<String, dynamic>> results = [];
-
     for (final r in _rows) {
       final sid = r["student_id"] as int;
+
       final marksText = _marksCtrls[sid]?.text.trim() ?? "";
       final remarksText = _remarksCtrls[sid]?.text.trim() ?? "";
 
@@ -106,10 +106,12 @@ class _ExamResultsPageState extends State<ExamResultsPage> {
     try {
       final saved = await api.submitExamResults(examId, results);
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Results saved: $saved")),
       );
-      await _load(); // refresh and persist
+
+      await _load();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -124,86 +126,87 @@ class _ExamResultsPageState extends State<ExamResultsPage> {
     final maxMarks = widget.exam["max_marks"]?.toString() ?? "";
 
     return AppShell(
-  title: "Results: $title",
-  selectedIndex: 3,
-  breadcrumbs: [
-    BreadcrumbItem("Exams", onTap: () => Navigator.pop(context)),
-    BreadcrumbItem("Results"),
-  ],
-  body: Padding(
-    padding: const EdgeInsets.all(12),
-    child: Column(
-      children: [
-        Row(
+      title: "Results: $title",
+      selectedIndex: 3,
+      breadcrumbs: [
+        BreadcrumbItem("Exams", onTap: () => Navigator.pop(context)),
+        const BreadcrumbItem("Results"),
+      ],
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
           children: [
-            Expanded(child: Text("Max marks: $maxMarks")),
-            TextButton(onPressed: _load, child: const Text("Reload")),
-          ],
-        ),
-        const SizedBox(height: 8),
-        if (_loading)
-          const Expanded(child: Center(child: CircularProgressIndicator())),
-        if (!_loading && _error != null)
-          Expanded(child: Center(child: Text("Error: $_error"))),
-        if (!_loading && _error == null)
-          Expanded(
-            child: ListView.separated(
-              itemCount: _rows.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final r = _rows[index];
-                final sid = r["student_id"] as int;
-                final name = r["student_name"]?.toString() ?? "";
+            Row(
+              children: [
+                Expanded(child: Text("Max marks: $maxMarks")),
+                TextButton(onPressed: _load, child: const Text("Reload")),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (_loading)
+              const Expanded(child: Center(child: CircularProgressIndicator())),
+            if (!_loading && _error != null)
+              Expanded(child: Center(child: Text("Error: $_error"))),
+            if (!_loading && _error == null)
+              Expanded(
+                child: ListView.separated(
+                  itemCount: _rows.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final r = _rows[index];
+                    final sid = r["student_id"] as int;
+                    final name = r["student_name"]?.toString() ?? "";
 
-                return ListTile(
-                  title: Text(name),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 6),
-                      Row(
+                    return ListTile(
+                      title: Text(name),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SizedBox(
-                            width: 120,
-                            child: TextField(
-                              controller: _marksCtrls[sid],
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                labelText: "Marks",
-                                border: OutlineInputBorder(),
-                                isDense: true,
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: 120,
+                                child: TextField(
+                                  controller: _marksCtrls[sid],
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: "Marks",
+                                    border: OutlineInputBorder(),
+                                    isDense: true,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: TextField(
-                              controller: _remarksCtrls[sid],
-                              decoration: const InputDecoration(
-                                labelText: "Remarks",
-                                border: OutlineInputBorder(),
-                                isDense: true,
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: TextField(
+                                  controller: _remarksCtrls[sid],
+                                  decoration: const InputDecoration(
+                                    labelText: "Remarks",
+                                    border: OutlineInputBorder(),
+                                    isDense: true,
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _loading ? null : _submit,
+                child: const Text("Submit Results"),
+              ),
             ),
-          ),
-        const SizedBox(height: 10),
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: _loading ? null : _submit,
-            child: const Text("Submit Results"),
-          ),
+          ],
         ),
-      ],
-    ),
-  ),
-);
+      ),
+    );
+  }
 }

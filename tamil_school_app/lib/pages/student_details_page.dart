@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../app_shell.dart';
 
 class StudentDetailsPage extends StatelessWidget {
@@ -14,9 +15,8 @@ class StudentDetailsPage extends StatelessWidget {
     // Optional fields (show "-" if not provided by API)
     final batchName =
         student["batch_name"]?.toString() ?? student["batch"]?.toString() ?? "-";
-    final branchCity = student["branch_city"]?.toString() ??
-        student["branch"]?.toString() ??
-        "-";
+    final branchCity =
+        student["branch_city"]?.toString() ?? student["branch"]?.toString() ?? "-";
     final active = (student["active"] == true) ? "Active" : "Inactive";
 
     return AppShell(

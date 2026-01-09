@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import '../main.dart'; // uses global `api`
+
 import '../app_shell.dart';
+import '../main.dart'; // uses global `api`
 
 class AttendancePage extends StatefulWidget {
-  final Map<String, dynamic> batch;
+  final Map batch;
+
   const AttendancePage({super.key, required this.batch});
 
   @override
@@ -13,7 +15,6 @@ class AttendancePage extends StatefulWidget {
 class _AttendancePageState extends State<AttendancePage> {
   bool _loading = true;
   String? _error;
-
   late DateTime _selectedDate;
 
   List<Map<String, dynamic>> _students = []; // {student_id, student_name, status, note}
@@ -40,9 +41,7 @@ class _AttendancePageState extends State<AttendancePage> {
       lastDate: DateTime(2035),
     );
     if (picked == null) return;
-    setState(() {
-      _selectedDate = picked;
-    });
+    setState(() => _selectedDate = picked);
     await _load();
   }
 
@@ -60,7 +59,7 @@ class _AttendancePageState extends State<AttendancePage> {
       final students = (data["students"] as List).cast<dynamic>();
 
       setState(() {
-        _students = students.map((e) => Map<String, dynamic>.from(e)).toList();
+        _students = students.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         _loading = false;
       });
     } catch (e) {
@@ -83,7 +82,7 @@ class _AttendancePageState extends State<AttendancePage> {
 
     // Only submit records that have a status chosen
     final records = _students
-        .where((s) => s["status"] != null && (s["status"] as String).isNotEmpty)
+        .where((s) => (s["status"] ?? "").toString().isNotEmpty)
         .map((s) => {
               "student_id": s["student_id"],
               "status": s["status"],
@@ -94,10 +93,12 @@ class _AttendancePageState extends State<AttendancePage> {
     try {
       final saved = await api.submitAttendance(batchId, dateStr, records);
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Attendance saved: $saved")),
       );
-      await _load(); // refresh
+
+      await _load();
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -106,18 +107,30 @@ class _AttendancePageState extends State<AttendancePage> {
     }
   }
 
+  Widget _statusBtn(int index, String label, String value, bool selected) {
+    return OutlinedButton(
+      onPressed: () => _setStatus(index, value),
+      style: OutlinedButton.styleFrom(
+        backgroundColor: selected ? Colors.black12 : null,
+        minimumSize: const Size(40, 36),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+      ),
+      child: Text(label),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final batchName = widget.batch["name"];
-    final year = widget.batch["year"];
-    final branchCity = widget.batch["branch_city"];
+    final batchName = widget.batch["name"]?.toString() ?? "";
+    final year = widget.batch["year"]?.toString() ?? "";
+    final branchCity = widget.batch["branch_city"]?.toString() ?? "";
 
     return AppShell(
       title: "Attendance: $batchName",
       selectedIndex: 2,
       breadcrumbs: [
         BreadcrumbItem("Batches", onTap: () => Navigator.pop(context)),
-        BreadcrumbItem("Attendance"),
+        const BreadcrumbItem("Attendance"),
       ],
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -144,8 +157,9 @@ class _AttendancePageState extends State<AttendancePage> {
                   separatorBuilder: (_, __) => const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final s = _students[index];
-                    final name = s["student_name"] ?? "";
+                    final name = (s["student_name"] ?? "").toString();
                     final status = s["status"];
+
                     return ListTile(
                       title: Text(name),
                       subtitle: Text("Status: ${status ?? '-'}"),
@@ -172,17 +186,6 @@ class _AttendancePageState extends State<AttendancePage> {
           ],
         ),
       ),
-    );
-
-  Widget _statusBtn(int index, String label, String value, bool selected) {
-    return OutlinedButton(
-      onPressed: () => _setStatus(index, value),
-      style: OutlinedButton.styleFrom(
-        backgroundColor: selected ? Colors.black12 : null,
-        minimumSize: const Size(40, 36),
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-      ),
-      child: Text(label),
     );
   }
 }

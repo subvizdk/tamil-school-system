@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../main.dart'; // global api
 import '../app_shell.dart';
-
 import 'attendance_page.dart';
 import 'exams_page.dart';
 
@@ -32,7 +32,7 @@ class _BatchesPageState extends State<BatchesPage> {
     try {
       final data = await api.getBatches();
       setState(() {
-        _batches = data;
+        _batches = (data as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
         _loading = false;
       });
     } catch (e) {
@@ -41,6 +41,20 @@ class _BatchesPageState extends State<BatchesPage> {
         _loading = false;
       });
     }
+  }
+
+  void _openAttendance(Map<String, dynamic> batch) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => AttendancePage(batch: batch)),
+    );
+  }
+
+  void _openExams(Map<String, dynamic> batch) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ExamsPage(batch: batch)),
+    );
   }
 
   @override
@@ -60,19 +74,26 @@ class _BatchesPageState extends State<BatchesPage> {
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final b = _batches[index];
+                      final name = b["name"]?.toString() ?? "-";
+                      final year = b["year"]?.toString() ?? "-";
+                      final branchCity = b["branch_city"]?.toString() ?? "-";
+                      final courseName = b["course_name"]?.toString() ?? "-";
+
                       return ListTile(
-                        title: Text("${b["name"]} (${b["year"]})"),
-                        subtitle:
-                            Text("${b["branch_city"]} • ${b["course_name"]}"),
-                        trailing: const Icon(Icons.chevron_right),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AttendancePage(batch: b),
+                        title: Text("$name ($year)"),
+                        subtitle: Text("$branchCity • $courseName"),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              tooltip: "Exams",
+                              icon: const Icon(Icons.assignment_outlined),
+                              onPressed: () => _openExams(b),
                             ),
-                          );
-                        },
+                            const Icon(Icons.chevron_right),
+                          ],
+                        ),
+                        onTap: () => _openAttendance(b),
                       );
                     },
                   ),

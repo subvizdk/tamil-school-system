@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../main.dart'; // global api
 import '../app_shell.dart';
 
-typedef OnBatchPicked = void Function(BuildContext context, Map<String, dynamic> batch);
+typedef OnBatchPicked = void Function(BuildContext context, Map batch);
 
 class BatchPickerPage extends StatefulWidget {
   final String title;
@@ -40,7 +41,7 @@ class _BatchPickerPageState extends State<BatchPickerPage> {
     try {
       final data = await api.getBatches();
       setState(() {
-        _batches = data;
+        _batches = (data as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
         _loading = false;
       });
     } catch (e) {
@@ -68,9 +69,14 @@ class _BatchPickerPageState extends State<BatchPickerPage> {
                     separatorBuilder: (_, __) => const Divider(height: 1),
                     itemBuilder: (context, i) {
                       final b = _batches[i];
+                      final name = b["name"]?.toString() ?? "-";
+                      final year = b["year"]?.toString() ?? "-";
+                      final branchCity = b["branch_city"]?.toString() ?? "-";
+                      final courseName = b["course_name"]?.toString() ?? "-";
+
                       return ListTile(
-                        title: Text("${b["name"]} (${b["year"]})"),
-                        subtitle: Text("${b["branch_city"]} • ${b["course_name"]}"),
+                        title: Text("$name ($year)"),
+                        subtitle: Text("$branchCity • $courseName"),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () => widget.onPicked(context, b),
                       );

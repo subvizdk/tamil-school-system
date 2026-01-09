@@ -4,7 +4,13 @@ import '../app_shell.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  Widget _card(BuildContext context, IconData icon, String title, String subtitle, VoidCallback onTap) {
+  Widget _card(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -18,7 +24,13 @@ class HomePage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     Text(subtitle),
                   ],
@@ -42,10 +54,10 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: ListView(
           children: [
-            _card(context, Icons.people, "Students", "View & manage students", () {
+            _card(context, Icons.people, "Students", "View students", () {
               Navigator.pushReplacementNamed(context, "/students");
             }),
-            _card(context, Icons.group_work, "Batches", "Classes / groups by branch", () {
+            _card(context, Icons.group_work, "Batches", "Classes / groups", () {
               Navigator.pushReplacementNamed(context, "/batches");
             }),
             _card(context, Icons.menu_book, "Courses", "Manage course list", () {
