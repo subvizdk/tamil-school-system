@@ -157,4 +157,5 @@ class ApiService {
       : "";
   final res = await get("/api/courses/$query");
   return res as List<dynamic>;
+  }
 }
