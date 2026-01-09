@@ -49,6 +49,7 @@ class _StudentsPageState extends State<StudentsPage> {
     return AppShell(
       title: "Students",
       selectedIndex: 1,
+      breadcrumbs: const [BreadcrumbItem("Students")],
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(

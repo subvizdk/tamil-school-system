@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../main.dart'; // to access global `api`
 import 'exam_results_page.dart';
+import '../app_shell.dart';
 
 class ExamsPage extends StatefulWidget {
   final Map<String, dynamic> batch;
@@ -67,7 +68,7 @@ class _ExamsPageState extends State<ExamsPage> {
     final year = widget.batch["year"];
     final branchCity = widget.batch["branch_city"];
 
-    return Scaffold(
+    return AppShell(
       appBar: AppBar(title: Text("Exams: $batchName")),
       body: Padding(
         padding: const EdgeInsets.all(12),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'pages/home_page.dart';
 import 'pages/students_page.dart';
 import 'pages/batches_page.dart';
@@ -6,9 +7,11 @@ import 'pages/exams_page.dart';
 
 class BreadcrumbItem {
   final String label;
-  final VoidCallback? onTap; // if null => current page (not clickable)
 
-  BreadcrumbItem(this.label, {this.onTap});
+  /// If null => current page (not clickable)
+  final VoidCallback? onTap;
+
+  const BreadcrumbItem(this.label, {this.onTap});
 }
 
 class AppShell extends StatelessWidget {
@@ -35,8 +38,7 @@ class AppShell extends StatelessWidget {
       appBar: AppBar(
         title: Text(title),
 
-        // If we can pop => show back arrow
-        // else => show hamburger menu (drawer)
+        // Back on subpages; hamburger on root pages
         leading: canGoBack
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -48,10 +50,19 @@ class AppShell extends StatelessWidget {
                   onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
               ),
+
+        // ✅ Always allow opening the menu, even on subpages
+        actions: [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu_open),
+              tooltip: "Menu",
+              onPressed: () => Scaffold.of(context).openDrawer(),
+            ),
+          ),
+        ],
       ),
-
       drawer: _AppDrawer(selectedIndex: selectedIndex),
-
       body: SafeArea(
         child: Column(
           children: [
@@ -104,9 +115,7 @@ class _Crumb extends StatelessWidget {
       color: item.onTap == null ? Colors.black87 : Colors.blue,
     );
 
-    if (item.onTap == null) {
-      return Text(item.label, style: style);
-    }
+    if (item.onTap == null) return Text(item.label, style: style);
 
     return InkWell(
       onTap: item.onTap,
@@ -121,7 +130,6 @@ class _AppDrawer extends StatelessWidget {
   const _AppDrawer({required this.selectedIndex});
 
   void _go(BuildContext context, Widget page) {
-    // Close drawer, then navigate
     Navigator.pop(context);
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => page));
   }
@@ -140,7 +148,6 @@ class _AppDrawer extends StatelessWidget {
               ),
             ),
             const Divider(),
-
             ListTile(
               selected: selectedIndex == 0,
               leading: const Icon(Icons.dashboard_outlined),

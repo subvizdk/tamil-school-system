@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../main.dart'; // global api
+import '../app_shell.dart';
 
 class ExamResultsPage extends StatefulWidget {
   final Map<String, dynamic> exam; // {id,title,exam_date,max_marks,...}
@@ -122,7 +123,7 @@ class _ExamResultsPageState extends State<ExamResultsPage> {
     final title = widget.exam["title"]?.toString() ?? "Exam";
     final maxMarks = widget.exam["max_marks"]?.toString() ?? "";
 
-    return Scaffold(
+    return AppShell(
       appBar: AppBar(title: Text("Results: $title")),
       body: Padding(
         padding: const EdgeInsets.all(12),

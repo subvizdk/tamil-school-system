@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../main.dart'; // uses global `api`
+import '../app_shell.dart';
 
 class AttendancePage extends StatefulWidget {
   final Map<String, dynamic> batch;
@@ -111,7 +112,7 @@ class _AttendancePageState extends State<AttendancePage> {
     final year = widget.batch["year"];
     final branchCity = widget.batch["branch_city"];
 
-    return Scaffold(
+    return AppShell(
       appBar: AppBar(
         title: Text("Attendance: $batchName"),
       ),

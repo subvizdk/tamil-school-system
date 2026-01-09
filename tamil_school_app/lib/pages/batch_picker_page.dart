@@ -56,6 +56,7 @@ class _BatchPickerPageState extends State<BatchPickerPage> {
     return AppShell(
       title: widget.title,
       selectedIndex: widget.drawerIndex,
+      breadcrumbs: const [BreadcrumbItem("Students")],
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: _loading
