@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from academics.views import courses_list
+
 
 urlpatterns = [
     path("me/", views.me),
@@ -14,5 +16,7 @@ urlpatterns = [
     path("batches/", views.batches_list),
     path("exams/batch/<int:batch_id>/", views.exams_for_batch),
     path("exams/<int:exam_id>/results/submit/", views.exam_results_submit),
+    path("courses/", courses_list, name="courses_list"),
+
 
 ]
