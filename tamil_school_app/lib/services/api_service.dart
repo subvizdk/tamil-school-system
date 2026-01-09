@@ -151,11 +151,12 @@ class ApiService {
 
     return (res.data["saved"] as int?) ?? 0;
   }
-  Future<List<dynamic>> getCourses({String? q}) async {
+Future<List<dynamic>> getCourses({String? q}) async {
   final query = (q != null && q.trim().isNotEmpty)
       ? "?q=${Uri.encodeComponent(q.trim())}"
       : "";
-  final res = await get("/api/courses/$query");
-  return res as List<dynamic>;
-  }
+
+  final res = await _dio.get("/courses/$query");
+  return res.data as List<dynamic>;
+}
 }
