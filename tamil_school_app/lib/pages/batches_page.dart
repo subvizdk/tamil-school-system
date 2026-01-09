@@ -48,7 +48,7 @@ class _BatchesPageState extends State<BatchesPage> {
     return AppShell(
       title: "Batches",
       selectedIndex: 2,
-      breadcrumbs: const [BreadcrumbItem("Students")],
+      breadcrumbs: const [BreadcrumbItem("Batches")],
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: _loading

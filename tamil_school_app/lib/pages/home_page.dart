@@ -37,7 +37,7 @@ class HomePage extends StatelessWidget {
     return AppShell(
       title: "Home",
       selectedIndex: 0,
-      breadcrumbs: const [BreadcrumbItem("Students")],
+      breadcrumbs: const [BreadcrumbItem("Home")],
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: ListView(

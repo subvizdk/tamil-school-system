@@ -113,9 +113,12 @@ class _AttendancePageState extends State<AttendancePage> {
     final branchCity = widget.batch["branch_city"];
 
     return AppShell(
-      appBar: AppBar(
-        title: Text("Attendance: $batchName"),
-      ),
+      title: "Attendance: $batchName",
+      selectedIndex: 2,
+      breadcrumbs: [
+        BreadcrumbItem("Batches", onTap: () => Navigator.pop(context)),
+        BreadcrumbItem("Attendance"),
+      ],
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -130,11 +133,10 @@ class _AttendancePageState extends State<AttendancePage> {
               ],
             ),
             const SizedBox(height: 8),
-
-            if (_loading) const Expanded(child: Center(child: CircularProgressIndicator())),
+            if (_loading)
+              const Expanded(child: Center(child: CircularProgressIndicator())),
             if (!_loading && _error != null)
               Expanded(child: Center(child: Text("Error: $_error"))),
-
             if (!_loading && _error == null)
               Expanded(
                 child: ListView.separated(
@@ -143,8 +145,7 @@ class _AttendancePageState extends State<AttendancePage> {
                   itemBuilder: (context, index) {
                     final s = _students[index];
                     final name = s["student_name"] ?? "";
-                    final status = s["status"]; // may be null
-
+                    final status = s["status"];
                     return ListTile(
                       title: Text(name),
                       subtitle: Text("Status: ${status ?? '-'}"),
@@ -160,7 +161,6 @@ class _AttendancePageState extends State<AttendancePage> {
                   },
                 ),
               ),
-
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
@@ -173,7 +173,6 @@ class _AttendancePageState extends State<AttendancePage> {
         ),
       ),
     );
-  }
 
   Widget _statusBtn(int index, String label, String value, bool selected) {
     return OutlinedButton(

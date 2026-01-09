@@ -22,7 +22,10 @@ class StudentDetailsPage extends StatelessWidget {
     return AppShell(
       title: "Student Details",
       selectedIndex: 1,
-      breadcrumbs: const [BreadcrumbItem("Students")],
+      breadcrumbs: [
+        BreadcrumbItem("Students", onTap: () => Navigator.pop(context)),
+        BreadcrumbItem(name),
+      ],
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(

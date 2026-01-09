@@ -69,54 +69,59 @@ class _ExamsPageState extends State<ExamsPage> {
     final branchCity = widget.batch["branch_city"];
 
     return AppShell(
-      appBar: AppBar(title: Text("Exams: $batchName")),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
+  title: "Exams: $batchName",
+  selectedIndex: 3, // Exams drawer index
+  breadcrumbs: [
+    BreadcrumbItem("Batches", onTap: () => Navigator.pop(context)),
+    BreadcrumbItem("Exams"),
+  ],
+  body: Padding(
+    padding: const EdgeInsets.all(12),
+    child: Column(
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                Expanded(child: Text("$branchCity • $year")),
-              ],
-            ),
-            const SizedBox(height: 8),
-
-            if (_loading) const Expanded(child: Center(child: CircularProgressIndicator())),
-            if (!_loading && _error != null)
-              Expanded(child: Center(child: Text("Error: $_error"))),
-
-            if (!_loading && _error == null)
-              Expanded(
-                child: ListView.separated(
-                  itemCount: _exams.length,
-                  separatorBuilder: (_, __) => const Divider(height: 1),
-                  itemBuilder: (context, index) {
-                    final exam = _exams[index];
-                    final title = exam["title"];
-                    final examId = exam["id"];
-                    final maxMarks = exam["max_marks"];
-
-                    return ListTile(
-                      title: Text(title),
-                      subtitle: Text("Max marks: $maxMarks"),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () {
-                       Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                        builder: (_) => ExamResultsPage(exam: exam),
-                        ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-
-            const SizedBox(height: 8),
+            Expanded(child: Text("$branchCity • $year")),
           ],
         ),
-      ),
-    );
-  }
+        const SizedBox(height: 8),
+
+        if (_loading)
+          const Expanded(child: Center(child: CircularProgressIndicator())),
+
+        if (!_loading && _error != null)
+          Expanded(child: Center(child: Text("Error: $_error"))),
+
+        if (!_loading && _error == null)
+          Expanded(
+            child: ListView.separated(
+              itemCount: _exams.length,
+              separatorBuilder: (_, __) => const Divider(height: 1),
+              itemBuilder: (context, index) {
+                final exam = _exams[index];
+                final title = exam["title"];
+                final maxMarks = exam["max_marks"];
+
+                return ListTile(
+                  title: Text(title),
+                  subtitle: Text("Max marks: $maxMarks"),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ExamResultsPage(exam: exam),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+
+        const SizedBox(height: 8),
+      ],
+    ),
+  ),
+);
 }
