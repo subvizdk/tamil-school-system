@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 class ApiService {
   // Chrome web -> Django on same machine
-  static const String baseUrl = "http://127.0.0.1:8000/api";
+  static const String baseUrl = "http://10.121.154.37:8000/api";
 
   final Dio _dio = Dio(
     BaseOptions(
@@ -151,4 +151,10 @@ class ApiService {
 
     return (res.data["saved"] as int?) ?? 0;
   }
+  Future<List<dynamic>> getCourses({String? q}) async {
+  final query = (q != null && q.trim().isNotEmpty)
+      ? "?q=${Uri.encodeComponent(q.trim())}"
+      : "";
+  final res = await get("/api/courses/$query");
+  return res as List<dynamic>;
 }
